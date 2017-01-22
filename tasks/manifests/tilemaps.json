@@ -4,5 +4,7 @@
     "src/tilemap/Tilemap.js",
     "src/tilemap/TilemapLayer.js",
     "src/tilemap/TilemapParser.js",
-    "src/tilemap/Tileset.js"
+    "src/tilemap/Tileset.js",
+
+    "src/tilemap/TilemapLayerGL.js"
 ]
