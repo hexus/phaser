@@ -618,11 +618,22 @@ Phaser.Tilemap.prototype = {
         }
 
         // create the internal layers for different tilesets using this one as a base description
-        for (var i = 1, l = this.tilesets.length; i < l; i++)
+        for (var i = 0, l = this.tilesets.length; i < l; i++)
         {
-            var ts = this.tilesets[i];
-            var li = this.layers[index];
-            this.createInternalLayer( "_internal" + i.toString(), ts, li.width, li.height, ts.tileWidth, ts.tileHeight, group );
+            var tileset = this.tilesets[i];
+            var layer = this.layers[index];
+            var layerName = layer.name || index;
+            var tilesetName = tileset.name || i;
+            
+            this.createInternalLayer(
+                "_internal_" + layerName + '_' + tilesetName,
+                tileset,
+                layer.width,
+                layer.height,
+                tileset.tileWidth,
+                tileset.tileHeight,
+                group
+            );
         }
 
         if ( this.game.renderType === Phaser.WEBGL )
