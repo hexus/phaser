@@ -3,7 +3,13 @@
  * Tilemap - constructor
  * 
  * @param {Array} layer - layer data from the map, arranged in mapheight lists of mapwidth Phaser.Tile objects (2d array)
- * 
+ * @param {integer} mapwidth
+ * @param {integer} mapheight
+ * @param {integer} tilewidth
+ * @param {integer} tileheight
+ * @param {integer} tilesetwidth
+ * @param {integer} tilesetheight
+ * @param {Phaser.TilemapLayer} layer
  */
 PIXI.Tilemap = function(texture, mapwidth, mapheight, tilewidth, tileheight, tilesetwidth, tilesetheight, layer)
 {
@@ -138,9 +144,6 @@ PIXI.Tilemap.prototype._renderBatch = function( renderSession )
     // destination buffer dimensions (halved)
     var screenWide2 = this.texture.width * 0.5;
     var screenHigh2 = this.texture.height * 0.5;
-
-    // TODO: this.texture is the destination texture, but is being treated as
-    //       the source texture below
 
     // size of one pixel in the source texture
     var iTextureWide = 1.0 / this.tilesetWidth;

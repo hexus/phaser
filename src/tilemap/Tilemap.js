@@ -620,13 +620,13 @@ Phaser.Tilemap.prototype = {
         // create the internal layers for different tilesets using this one as a base description
         for (var i = 0, l = this.tilesets.length; i < l; i++)
         {
-            var tileset = this.tilesets[i];
             var layer = this.layers[index];
-            var layerName = layer.name || index;
+            var tileset = this.tilesets[i];
+            //var layerName = layer.name || index;
             var tilesetName = tileset.name || i;
             
             this.createInternalLayer(
-                "_internal_" + layerName + '_' + tilesetName,
+                "_internal_" + tilesetName,
                 tileset,
                 layer.width,
                 layer.height,
