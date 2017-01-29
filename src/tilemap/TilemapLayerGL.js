@@ -98,7 +98,7 @@ Phaser.TilemapLayerGL = function (game, tilemap, index, width, height) {
     * @property {boolean} debug
     * @default
     */
-    this.debug = true;
+    this.debug = false;
 
     /**
     * @property {boolean} exists - Controls if the core game loop and physics update this game object or not.
@@ -189,6 +189,10 @@ Phaser.TilemapLayerGL = function (game, tilemap, index, width, height) {
         tileWidth: tilemap.tileWidth,
         tileHeight: tilemap.tileHeight,
 
+        // dimensions of the tileset
+        tilesetWidth: tileset.tileWidth * tileset.columns,
+        tilesetHeight: tileset.tileHeight * tileset.rows,
+
         // Collision width/height (pixels)
         // What purpose do these have? Most things use tile width/height directly.
         // This also only extends collisions right and down.
@@ -235,7 +239,17 @@ Phaser.TilemapLayerGL = function (game, tilemap, index, width, height) {
 
     // get PIXI textures for each tileset source image
     var baseTexture = new PIXI.BaseTexture( tileset.image );
-    PIXI.Tilemap.call(this, new PIXI.Texture(baseTexture), this.map.width, this.map.height, this._mc.tileset.tileWidth, this._mc.tileset.tileHeight, this.layer);
+    PIXI.Tilemap.call(
+        this,
+        new PIXI.Texture(baseTexture),
+        this.map.width,
+        this.map.height,
+        this._mc.tileWidth,
+        this._mc.tileHeight,
+        this._mc.tilesetWidth,
+        this._mc.tilesetHeight,
+        this.layer
+    );
 
     Phaser.Component.Core.init.call(this, game, 0, 0, null, null);
 
@@ -740,7 +754,7 @@ Phaser.TilemapLayerGL.prototype.renderRegion = function (scrollX, scrollY, left,
 * @private
 */
 Phaser.TilemapLayerGL.prototype.renderFull = function () {
-    
+
     var scrollX = this._mc.scrollX;
     var scrollY = this._mc.scrollY;
 
@@ -760,6 +774,7 @@ Phaser.TilemapLayerGL.prototype.renderFull = function () {
 
     this.glBatch = [];
     this.renderRegion(scrollX, scrollY, left, top, right, bottom, 0, -(ch - th));
+
 };
 
 /**

@@ -657,7 +657,7 @@ Phaser.Tilemap.prototype = {
     */
     createInternalLayer: function (name, tileset, width, height, tileWidth, tileHeight, group) {
 
-        console.log("Tilemap.createInternalLayer", name, width, height);
+        console.log("Tilemap.createInternalLayer", name, width, height, tileset.name);
 
         if (group === undefined) { group = this.game.world; }
 

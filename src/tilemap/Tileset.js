@@ -167,7 +167,7 @@ Phaser.Tileset.prototype = {
     drawGl: function (glBatch, x, y, index, alpha) {
 
         // Correct the tile index for the set and bias for interlacing x/y values
-        var coordIndex = (index - this.firstgid) * 2;
+        var coordIndex = (index - this.firstgid) << 1;
 
         if (coordIndex >= 0 && (coordIndex + 1) < this.drawCoords.length)
         {

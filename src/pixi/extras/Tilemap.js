@@ -5,7 +5,7 @@
  * @param {Array} layer - layer data from the map, arranged in mapheight lists of mapwidth Phaser.Tile objects (2d array)
  * 
  */
-PIXI.Tilemap = function(texture, mapwidth, mapheight, tilewidth, tileheight, layer)
+PIXI.Tilemap = function(texture, mapwidth, mapheight, tilewidth, tileheight, tilesetwidth, tilesetheight, layer)
 {
     PIXI.DisplayObjectContainer.call(this);
 
@@ -22,6 +22,8 @@ PIXI.Tilemap = function(texture, mapwidth, mapheight, tilewidth, tileheight, lay
     this.tileHigh = tileheight;
     this.mapWide = mapwidth;
     this.mapHigh = mapheight;
+    this.tilesetWidth = tilesetwidth;
+    this.tilesetHeight = tilesetheight;
 
     // TODO: switch here to create DisplayObjectContainer at correct size for the render mode
     this.width = this.mapWide * this.tileWide;
@@ -133,13 +135,16 @@ PIXI.Tilemap.prototype._renderBatch = function( renderSession )
   {
     var gl = renderSession.gl;
 
-    // TODO: should probably use destination buffer dimensions (halved)
-    var screenWide2 = this.game.width * 0.5;
-    var screenHigh2 = this.game.height * 0.5;
+    // destination buffer dimensions (halved)
+    var screenWide2 = this.texture.width * 0.5;
+    var screenHigh2 = this.texture.height * 0.5;
+
+    // TODO: this.texture is the destination texture, but is being treated as
+    //       the source texture below
 
     // size of one pixel in the source texture
-    var iTextureWide = 1.0 / this.texture.width;
-    var iTextureHigh = 1.0 / this.texture.height;
+    var iTextureWide = 1.0 / this.tilesetWidth;
+    var iTextureHigh = 1.0 / this.tilesetHeight;
 
     // size of one tile in the source texture
     var srcWide = this.tileWide * iTextureWide;
@@ -153,11 +158,12 @@ PIXI.Tilemap.prototype._renderBatch = function( renderSession )
     var high = this.tileHigh * 0.5 / screenHigh2;
 
     var buffer = this.buffer;
-    var oldR, oldT, uvl, uvt;
+    var oldR, oldT;
 
     // process entire glBatch into a single webGl draw buffer for a TRIANGLE_STRIP blit
     var c = 0;
     var degenerate = false;
+
     for(var i = 0, l = this.glBatch.length; i < l; i++)
     {
       // sx: this.drawCoords[coordIndex],
@@ -185,7 +191,7 @@ PIXI.Tilemap.prototype._renderBatch = function( renderSession )
       var bot = y + high;
 
       var uvl = t.sx * iTextureWide;
-      var uvt = t.sy * iTextureHigh; 
+      var uvt = t.sy * iTextureHigh;
 
       // insert a degenerate triangle to separate the tiles
       if ( degenerate )
@@ -356,4 +362,3 @@ PIXI.Tilemap.prototype.getBounds = function(matrix)
 
     return bounds;
 };
-
