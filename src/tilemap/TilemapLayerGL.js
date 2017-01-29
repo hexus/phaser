@@ -98,7 +98,7 @@ Phaser.TilemapLayerGL = function (game, tilemap, index, width, height) {
     * @property {boolean} debug
     * @default
     */
-    this.debug = false;
+    this.debug = true;
 
     /**
     * @property {boolean} exists - Controls if the core game loop and physics update this game object or not.
@@ -744,8 +744,8 @@ Phaser.TilemapLayerGL.prototype.renderFull = function () {
     var scrollX = this._mc.scrollX;
     var scrollY = this._mc.scrollY;
 
-    var renderW = this.game._width;     //this.canvas.width;
-    var renderH = this.game._height;    //this.canvas.height;
+    var renderW = this.game.width;     //this.canvas.width;
+    var renderH = this.game.height;    //this.canvas.height;
 
     var tw = this._mc.tileWidth;
     var th = this._mc.tileHeight;
