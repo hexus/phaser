@@ -1,8 +1,10 @@
 
 /**
- * Tilemap - constructor
+ * Tilemap constructor.
+ *
+ * TODO: Multiple tileset support.
  * 
- * @param {Array} layer - layer data from the map, arranged in mapheight lists of mapwidth Phaser.Tile objects (2d array)
+ * @param {PIXI.Texture} texture - The tileset texture to draw from
  * @param {integer} mapwidth
  * @param {integer} mapheight
  * @param {integer} tilewidth
@@ -11,25 +13,34 @@
  * @param {integer} tilesetheight
  * @param {Phaser.TilemapLayer} layer
  */
-PIXI.Tilemap = function(texture, mapwidth, mapheight, tilewidth, tileheight, tilesetwidth, tilesetheight, layer)
+PIXI.Tilemap = function(texture, mapwidth, mapheight, tilewidth, tileheight, layer)
 {
     PIXI.DisplayObjectContainer.call(this);
 
     /**
-     * The texture of the Tilemap
+     * The texture of the tileset.
+     *
+     * Source texture of the tilemap.
+     *
+     * @property sourceTexture
+     */
+     this.sourceTexture = texture;
+
+    /**
+     * The target texture of the Tilemap
      *
      * @property texture
      * @type Texture
      */
-    this.texture = texture;
+    this.texture = new PIXI.RenderTexture();
 
     // faster access to the tile dimensions
     this.tileWide = tilewidth;
     this.tileHigh = tileheight;
     this.mapWide = mapwidth;
     this.mapHigh = mapheight;
-    this.tilesetWidth = tilesetwidth;
-    this.tilesetHeight = tilesetheight;
+    this.tilesetWidth = this.sourceTexture.width;
+    this.tilesetHeight = this.sourceTexture.height;
 
     // TODO: switch here to create DisplayObjectContainer at correct size for the render mode
     this.width = this.mapWide * this.tileWide;
@@ -273,14 +284,14 @@ PIXI.Tilemap.prototype._renderWholeTilemap = function(renderSession)
   gl.activeTexture(gl.TEXTURE0);
 
   // check if a texture is dirty..
-  if(this.texture.baseTexture._dirty[gl.id])
+  if(this.sourceTexture.baseTexture._dirty[gl.id])
   {
-      renderSession.renderer.updateTexture(this.texture.baseTexture);
+      renderSession.renderer.updateTexture(this.sourceTexture.baseTexture);
   }
   else
   {
       // bind the current texture
-      gl.bindTexture(gl.TEXTURE_2D, this.texture.baseTexture._glTextures[gl.id]);
+      gl.bindTexture(gl.TEXTURE_2D, this.sourceTexture.baseTexture._glTextures[gl.id]);
   }
 
   // bind the source buffer

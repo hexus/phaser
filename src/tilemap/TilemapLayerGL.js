@@ -240,8 +240,6 @@ Phaser.TilemapLayerGL = function (game, tilemap, index, width, height) {
         this.map.height,
         this._mc.tileWidth,
         this._mc.tileHeight,
-        this._mc.tilesetWidth,
-        this._mc.tilesetHeight,
         this.layer
     );
 
