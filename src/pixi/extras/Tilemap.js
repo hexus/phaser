@@ -26,6 +26,9 @@ PIXI.Tilemap = function(texture, mapwidth, mapheight, tilewidth, tileheight, lay
      */
      this.sourceTexture = texture;
 
+     // Ensure nearest-neighbour scaling when sampling the source texture
+     this.sourceTexture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
+
     /**
      * The target texture of the Tilemap
      *
