@@ -183,10 +183,6 @@ Phaser.TilemapLayerGL = function (game, tilemap, index, width, height) {
         tileWidth: tilemap.tileWidth,
         tileHeight: tilemap.tileHeight,
 
-        // dimensions of the tileset
-        tilesetWidth: tileset.tileWidth * tileset.columns,
-        tilesetHeight: tileset.tileHeight * tileset.rows,
-
         // Collision width/height (pixels)
         // What purpose do these have? Most things use tile width/height directly.
         // This also only extends collisions right and down.
