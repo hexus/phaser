@@ -35,7 +35,7 @@ PIXI.Tilemap = function(texture, mapwidth, mapheight, tilewidth, tileheight, lay
      * @property texture
      * @type Texture
      */
-    this.texture = new PIXI.RenderTexture();
+    this.texture = new PIXI.Texture(new PIXI.BaseTexture());
 
     // faster access to the tile dimensions
     this.tileWide = tilewidth;
@@ -181,7 +181,15 @@ PIXI.Tilemap.prototype._renderBatch = function( renderSession )
     var c = 0;
     var degenerate = false;
 
-    for(var i = 0, l = this.glBatch.length; i < l; i++)
+    var pos = {
+      x: 0, y: 0
+    };
+    
+    var uv = {
+      x: 0, y: 0
+    };
+
+    for (var i = 0, l = this.glBatch.length; i < l; i++)
     {
       // sx: this.drawCoords[coordIndex],
       // sy: this.drawCoords[coordIndex + 1],
@@ -201,14 +209,23 @@ PIXI.Tilemap.prototype._renderBatch = function( renderSession )
         continue;
       }
 
-      var x = t.dx * iWide - 1;
-      var y = 1 - t.dy * iHigh;
+      // read the tile position and apply the world transform of the display object
+      pos.x = t.dx;
+      pos.y = t.dy;
+      this.worldTransform.apply(pos, pos);
+
+      var x = pos.x * iWide - 1;
+      var y = 1 - pos.y * iHigh;
 
       var lft = x - wide;
       var bot = y + high;
 
-      var uvl = t.sx * iTextureWide;
-      var uvt = t.sy * iTextureHigh;
+      uv.x = t.sx;
+      uv.y = t.sy;
+      //this.worldTransform.apply(uv, uv);
+
+      var uvl = uv.x * iTextureWide;
+      var uvt = uv.y * iTextureHigh;
 
       // insert a degenerate triangle to separate the tiles
       if ( degenerate )
