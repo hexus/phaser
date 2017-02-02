@@ -189,6 +189,8 @@ PIXI.Tilemap.prototype._renderBatch = function( renderSession )
       x: 0, y: 0
     };
 
+    var tmp;
+
     for (var i = 0, l = this.glBatch.length; i < l; i++)
     {
       // sx: this.drawCoords[coordIndex],
@@ -222,10 +224,26 @@ PIXI.Tilemap.prototype._renderBatch = function( renderSession )
 
       uv.x = t.sx;
       uv.y = t.sy;
-      //this.worldTransform.apply(uv, uv);
 
       var uvl = uv.x * iTextureWide;
+      var uvr = uvl + srcWide;
       var uvt = uv.y * iTextureHigh;
+      var uvb = uvt + srcHigh;
+
+      // Dirty hack to fix UVs when transform inverts scale
+      if (this.worldTransform.a < 0)
+      {
+          tmp = uvr;
+          uvr = uvl;
+          uvl = tmp;
+      }
+
+      if (this.worldTransform.d < 0)
+      {
+          tmp = uvb;
+          uvb = uvt;
+          uvt = tmp;
+      }
 
       // insert a degenerate triangle to separate the tiles
       if ( degenerate )
@@ -254,8 +272,8 @@ PIXI.Tilemap.prototype._renderBatch = function( renderSession )
       // calculate the uv coordinates of the tile source image
       buffer[ c +  2 ] = buffer[ c +  6 ] = uvl;
       buffer[ c +  3 ] = buffer[ c +  11] = uvt;
-      buffer[ c +  10] = buffer[ c +  14] = uvl + srcWide;
-      buffer[ c +  7 ] = buffer[ c +  15] = uvt + srcHigh;
+      buffer[ c +  10] = buffer[ c +  14] = uvr;
+      buffer[ c +  7 ] = buffer[ c +  15] = uvb;
 
       // advance the buffer index
       c += 16;
