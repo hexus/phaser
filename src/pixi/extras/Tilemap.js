@@ -214,36 +214,38 @@ PIXI.Tilemap.prototype._renderBatch = function( renderSession )
       // read the tile position and apply the world transform of the display object
       pos.x = t.dx;
       pos.y = t.dy;
-      this.worldTransform.apply(pos, pos);
+      //this.worldTransform.apply(pos, pos);
 
-      var x = pos.x * iWide - 1;
-      var y = 1 - pos.y * iHigh;
+      //var x = pos.x * iWide - 1;
+      //var y = 1 - pos.y * iHigh;
 
-      var lft = x - wide;
-      var bot = y + high;
+      var lft = pos.x - this.tileWide * 0.5;
+      var rgt = lft + this.tileWide;
+      var top = pos.y - this.tileHigh * 0.5;
+      var bot = top + this.tileHigh;
 
       uv.x = t.sx;
       uv.y = t.sy;
 
-      var uvl = uv.x * iTextureWide;
-      var uvr = uvl + srcWide;
-      var uvt = uv.y * iTextureHigh;
-      var uvb = uvt + srcHigh;
+      var uvl = uv.x;// * iTextureWide;
+      var uvr = uvl + this.tileWide;//; srcWide;
+      var uvt = uv.y; // * iTextureHigh;
+      var uvb = uvt + this.tileHigh;// srcHigh;
 
       // Dirty hack to fix UVs when transform inverts scale
-      if (this.worldTransform.a < 0)
-      {
-          tmp = uvr;
-          uvr = uvl;
-          uvl = tmp;
-      }
-
-      if (this.worldTransform.d < 0)
-      {
-          tmp = uvb;
-          uvb = uvt;
-          uvt = tmp;
-      }
+    //   if (this.worldTransform.a < 0)
+    //   {
+    //       tmp = uvr;
+    //       uvr = uvl;
+    //       uvl = tmp;
+    //   }
+      // 
+    //   if (this.worldTransform.d < 0)
+    //   {
+    //       tmp = uvb;
+    //       uvb = uvt;
+    //       uvt = tmp;
+    //   }
 
       // insert a degenerate triangle to separate the tiles
       if ( degenerate )
@@ -253,7 +255,7 @@ PIXI.Tilemap.prototype._renderBatch = function( renderSession )
         buffer[ c + 1 ] = oldT;
         // then repeat the next vertex
         buffer[ c + 4 ] = lft;
-        buffer[ c + 5 ] = bot;
+        buffer[ c + 5 ] = top;//bot;
         // pad with texture coordinates (probably not needed)
         buffer[ c + 2 ] = buffer[ c + 6 ] = uvl;
         buffer[ c + 3 ] = buffer[ c + 7 ] = uvt;
@@ -264,10 +266,10 @@ PIXI.Tilemap.prototype._renderBatch = function( renderSession )
       }
 
       // calculate the destination location of the tile in screen units (-1..1)
-      buffer[ c      ] = buffer[ c +  4 ] = lft;
-      buffer[ c +  1 ] = buffer[ c +  9 ] = bot;
-      buffer[ c +  8 ] = buffer[ c +  12] = oldR = x + wide;
-      buffer[ c +  5 ] = buffer[ c +  13] = oldT = y - high;
+      buffer[ c      ] = buffer[ c +  4 ] = lft;//lft
+      buffer[ c +  1 ] = buffer[ c +  9 ] = top;//bot
+      buffer[ c +  8 ] = buffer[ c +  12] = oldR = rgt;//x + wide;
+      buffer[ c +  5 ] = buffer[ c +  13] = oldT = bot;//y - high;
 
       // calculate the uv coordinates of the tile source image
       buffer[ c +  2 ] = buffer[ c +  6 ] = uvl;
@@ -310,6 +312,11 @@ PIXI.Tilemap.prototype._renderWholeTilemap = function(renderSession)
   renderSession.blendModeManager.setBlendMode(this.blendMode);
 
   // set the uniforms and texture
+
+  gl.uniform2f( shader.uSamplerResolution, this.sourceTexture.width, this.sourceTexture.height );
+  gl.uniform2f( shader.uResolution, this.texture.width, this.texture.height );
+  gl.uniform4f( shader.uMatrixScale, this.worldTransform.a, this.worldTransform.b, this.worldTransform.c, this.worldTransform.d );
+  gl.uniform2f( shader.uMatrixPos, this.worldTransform.tx, this.worldTransform.ty );
 
   // set the offset in screen units to the centre of the screen
   // and flip the GL y coordinate to be zero at the top

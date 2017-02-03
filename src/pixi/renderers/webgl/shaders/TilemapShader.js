@@ -55,14 +55,32 @@ PIXI.TilemapShader = function(gl)
 
     this.vertexSrc = [
         "  precision lowp float;",
+        "  uniform vec2 uResolution;",
+        "  uniform vec2 uSamplerResolution;",
         "  uniform vec2 uCentreOffset;",
+        "  uniform vec4 uMatrixScale;",
+        "  uniform vec2 uMatrixPos;",
         "  uniform vec2 uScale;",
         "  attribute vec4 aPosition;",
         "  varying vec2 vTexCoord;",
         "  void main(void) {",
         "    gl_Position.zw = vec2(1, 1);",
-        "    gl_Position.xy = (aPosition.xy + uCentreOffset) * uScale - uCentreOffset;",
-        "    vTexCoord = aPosition.zw;",
+        
+        // Oh hey there vertex
+        "    vec2 pos = aPosition.xy;",
+        
+        // Apply the world matrix
+        "    pos.x = uMatrixScale.x * pos.x + uMatrixScale.z * pos.y + uMatrixPos.x;",
+        "    pos.y = uMatrixScale.y * pos.x + uMatrixScale.w * pos.y + uMatrixPos.y;",
+        
+        // Aspect
+        "    pos = pos / uResolution * 2.0;",
+        "    pos.x = pos.x - 1.0;",
+        "    pos.y = 1.0 - pos.y;",
+        
+        // Et voila
+        "    gl_Position.xy = (pos.xy + uCentreOffset) * uScale - uCentreOffset;",
+        "    vTexCoord = aPosition.zw / uSamplerResolution;",
         "  }"
         ];
 
@@ -94,6 +112,10 @@ PIXI.TilemapShader.prototype.init = function()
     // get and store the attributes
     this.aPosition = gl.getAttribLocation(program, 'aPosition');
     this.uSampler = gl.getUniformLocation(program, 'uImageSampler');
+    this.uSamplerResolution = gl.getUniformLocation(program, 'uSamplerResolution');
+    this.uResolution = gl.getUniformLocation(program, 'uResolution');
+    this.uMatrixScale = gl.getUniformLocation(program, 'uMatrixScale');
+    this.uMatrixPos = gl.getUniformLocation(program, 'uMatrixPos');
     this.uCentreOffset = gl.getUniformLocation(program, 'uCentreOffset');
     this.uAlpha = gl.getUniformLocation(program, 'uAlpha');
     this.uScale = gl.getUniformLocation(program, 'uScale');
