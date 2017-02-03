@@ -155,41 +155,12 @@ PIXI.Tilemap.prototype._renderBatch = function( renderSession )
   {
     var gl = renderSession.gl;
 
-    // destination buffer dimensions (halved)
-    var screenWide2 = this.texture.width * 0.5;
-    var screenHigh2 = this.texture.height * 0.5;
-
-    // size of one pixel in the source texture
-    var iTextureWide = 1.0 / this.tilesetWidth;
-    var iTextureHigh = 1.0 / this.tilesetHeight;
-
-    // size of one tile in the source texture
-    var srcWide = this.tileWide * iTextureWide;
-    var srcHigh = this.tileHigh * iTextureHigh;
-
-    // pre-calculate inverse half-buffer dimensions
-    var iWide = 1.0 / screenWide2;
-    var iHigh = 1.0 / screenHigh2;
-
-    var wide = this.tileWide * 0.5 / screenWide2;
-    var high = this.tileHigh * 0.5 / screenHigh2;
-
     var buffer = this.buffer;
     var oldR, oldT;
 
     // process entire glBatch into a single webGl draw buffer for a TRIANGLE_STRIP blit
     var c = 0;
     var degenerate = false;
-
-    var pos = {
-      x: 0, y: 0
-    };
-    
-    var uv = {
-      x: 0, y: 0
-    };
-
-    var tmp;
 
     for (var i = 0, l = this.glBatch.length; i < l; i++)
     {
@@ -211,41 +182,15 @@ PIXI.Tilemap.prototype._renderBatch = function( renderSession )
         continue;
       }
 
-      // read the tile position and apply the world transform of the display object
-      pos.x = t.dx;
-      pos.y = t.dy;
-      //this.worldTransform.apply(pos, pos);
-
-      //var x = pos.x * iWide - 1;
-      //var y = 1 - pos.y * iHigh;
-
-      var lft = pos.x - this.tileWide * 0.5;
+      var lft = t.dx - this.tileWide * 0.5;
       var rgt = lft + this.tileWide;
-      var top = pos.y - this.tileHigh * 0.5;
+      var top = t.dy - this.tileHigh * 0.5;
       var bot = top + this.tileHigh;
 
-      uv.x = t.sx;
-      uv.y = t.sy;
-
-      var uvl = uv.x;// * iTextureWide;
-      var uvr = uvl + this.tileWide;//; srcWide;
-      var uvt = uv.y; // * iTextureHigh;
-      var uvb = uvt + this.tileHigh;// srcHigh;
-
-      // Dirty hack to fix UVs when transform inverts scale
-    //   if (this.worldTransform.a < 0)
-    //   {
-    //       tmp = uvr;
-    //       uvr = uvl;
-    //       uvl = tmp;
-    //   }
-      // 
-    //   if (this.worldTransform.d < 0)
-    //   {
-    //       tmp = uvb;
-    //       uvb = uvt;
-    //       uvt = tmp;
-    //   }
+      var uvl = t.sx;
+      var uvr = uvl + this.tileWide;
+      var uvt = t.sy;
+      var uvb = uvt + this.tileHigh;
 
       // insert a degenerate triangle to separate the tiles
       if ( degenerate )
@@ -311,20 +256,19 @@ PIXI.Tilemap.prototype._renderWholeTilemap = function(renderSession)
 
   renderSession.blendModeManager.setBlendMode(this.blendMode);
 
-  // set the uniforms and texture
+  // Set the uniforms and texture
 
+  // Source texture resolution
   gl.uniform2f( shader.uSamplerResolution, this.sourceTexture.width, this.sourceTexture.height );
+  // Target texture resolution
   gl.uniform2f( shader.uResolution, this.texture.width, this.texture.height );
+  // Matrix scale and skew
   gl.uniform4f( shader.uMatrixScale, this.worldTransform.a, this.worldTransform.b, this.worldTransform.c, this.worldTransform.d );
+  // Matrix translation
   gl.uniform2f( shader.uMatrixPos, this.worldTransform.tx, this.worldTransform.ty );
 
-  // set the offset in screen units to the centre of the screen
-  // and flip the GL y coordinate to be zero at the top
-  gl.uniform2f( shader.uCentreOffset, 1, -1 );
   // alpha value for whole batch
   gl.uniform1f( shader.uAlpha, this.alpha );
-  // scale factors for whole batch
-  gl.uniform2f( shader.uScale, this.worldScale.x, this.worldScale.y );
   // source texture unit
   gl.activeTexture(gl.TEXTURE0);
 

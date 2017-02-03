@@ -79,7 +79,7 @@ PIXI.TilemapShader = function(gl)
         "    pos.y = 1.0 - pos.y;",
         
         // Et voila
-        "    gl_Position.xy = (pos.xy + uCentreOffset) * uScale - uCentreOffset;",
+        "    gl_Position.xy = pos.xy;",
         "    vTexCoord = aPosition.zw / uSamplerResolution;",
         "  }"
         ];
@@ -116,9 +116,7 @@ PIXI.TilemapShader.prototype.init = function()
     this.uResolution = gl.getUniformLocation(program, 'uResolution');
     this.uMatrixScale = gl.getUniformLocation(program, 'uMatrixScale');
     this.uMatrixPos = gl.getUniformLocation(program, 'uMatrixPos');
-    this.uCentreOffset = gl.getUniformLocation(program, 'uCentreOffset');
     this.uAlpha = gl.getUniformLocation(program, 'uAlpha');
-    this.uScale = gl.getUniformLocation(program, 'uScale');
 
     this.attributes = [this.aPosition];
     this.uniforms = [this.uCentreOffset, this.uAlpha, this.uScale, this.uSampler];
